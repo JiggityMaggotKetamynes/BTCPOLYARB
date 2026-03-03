@@ -56,7 +56,31 @@ Christoper's Additions:
 
 - If the trading fees can be accessed by the api then they should be set programaticly, if not then you should be able to take in trading fees either through CSV or CLI interface.
 
+      * fees are completely negligible with minimum order size and assuming our deviation still exists when order book depth is within ~5% of the average which will offer us in the decimal points of slippage + 0.1% fee on everything on polymarket.... derebit/binance fees amount: 0.03% of notional value for options orders.
+
 - Time slipage needs to be backtest to make sure that the arbitrage opetunity doesn't slip away between the time that the script sees the opertunity and the execution of the order on both markets. There are two approches that we can take to this end:
+
+        ** my solution:
+
+what is the smallest, most obvious way to detect a positive arbitrage opporuntity 
+-- 
+options contract (sold-bought) --> cost variable, 1/ cost variable --> payout per optiosn chain 
+1) call spread payout, our options yes, yes_call
+2) put spread payout, our options no, no_call
+
+polymarket payouts, 1/y, 1/n 
+
+backtest, or creation of loop that will check, must confirm, by how much, and whether these opporutunities exist in our time slot
+
+when
+
+yes_call >  yes_PM && (1 - yes_call) < no_PM
+
+how much more does it pay (( this metric will be easy to infer arb edge from) )) 
+
+no_call > no_Pm && (1 - no_call) < yes_pm
+
+having this collection per day, would actually us to see, even based on one day, whether payouts increase closer or farther away from our relatively clumsy bounds from the options strikes
 
     - we do back testing to figure out how long they last. If you have optunities that persit for several hours or days the is likly not a real issue but if the oppertunites last for several seconds then this become a major statical issue.
     
