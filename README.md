@@ -1,48 +1,45 @@
-Bitcoin Up or Down - 1 hour
-pull C from binance
+Polymarket event: Bitcoin Up or Down - 1 hour @ 0700 - 0800 UTC everyday. 0700 = t.
+up or down from BTC/USDT 1 hour candle that begins on the time and date specified in the title
+which comes from Binance (almost positive it's the 1 hour *open*, not lesser time increments) 
 
 call spread: 
-c
+*open*
 sell
 buy 
                    
 put spread:
 buy 
 sell
-c
+*open*
 
-let's say 5 minutes in 
+On derebit, the strike prices between options contracts are separated by 500 dollars 
+|strike 1 - strike 2| == 500 dollar increments, which represent a variable cost less than or equal to 500, that pays strictly 500
+normalizing polymarket requires us to buy 500 x (cost from (0,1), which tells us the cost to acquire the payout for strictly 500
 
-strike 1 + strike 2 / 2 == 500 
-normalized polymarket == 500 contracts 
+in the last 30 days, the absolute difference of the price at 0800-0700 closes in ~ on 200, that means that there is a good shot that if our 
+strategy is more profitable at the prices closer to the strikes than there our plenty of days due to high nominal value of change that it would run into a favorable 
+condition
 
-call and put spread pay on avergae 3:1 
-call polymarket 2:1 
+examples:
 
-x is the avg distriubtion of prices in the interval 
-on average is 50 and decrease 1/x 
-
-example:
-
-1
+1 - call spread
+-- 
 price at 65030 = c 
 
-buy call spread
 sell 65000
 buy 64500
 check that payout exceeds polymarket +2% (slippage, fees) (down arrow)
 but no on polymarket ( up arrow)
 we want the call to come up on a low price, and polymarket to come down on c
-
 arb condition fulfilled if price finishes above 65000, or below 65030
 
 65029 pays from PM
 
-2
-
+2 - put spread 
+-- 
 price at 65495
-put spread ( sell above threshold which pays strictly 1 below) // I believe the sell is the reference point for anything below
 
+put spread ( sell above threshold which pays strictly 1 below) // I believe the sell is the reference point for anything below
 buy at 67000
 sell at 66500 ( anything below 66 pays strictly 1) 
 
@@ -91,7 +88,6 @@ If this is too slow and we are missing good arb opps then we can proably get dow
 - Oppertunity cost back tests: once we have the script running the we come to the best type of problem to have how much do we put in. We are WELL withing the short term cap gains window so we can basicly buy the arb and then sell it as soon as it closes. We have two opertunity costs to account for frequency and duration.
 
 - Duration: if the arb opp is a dimond shape (i guess it would techincly rhombus) then it would be worth backtesting to figure out if we should strike once and try to get as close to the wide point as possible or if we take a statistical approch and try to spread our trades out through out the dimond either equaltly or accoriding to a distribution. Of note is this is again dependent on the duration of the arb opps. If they only last for like 200% of the time it takes the program to loop then this becomes a moot point.
-
 
 - Frequency: ideally the arb opps would all be sequenctial where if you have $100,000 then you just dump all the cash into the first trade and make $1,000 and sell when it closes and then repeat for the next one and make $2,200 so on but the problem is if they are nested (see figure 1) in this case it might be worth selling and buying the dip (assuming the spike isn't below slipage). Though this for whatever reason Im having a heard to intuiting if this is the correct stratigy. 
 
