@@ -27,7 +27,10 @@ example:
 1
 price at 65030 = c 
 
-buy call spread where sell ends at 65000 && check that payout exceeds polymarket +2% (slippage, fees) (down arrow)
+buy call spread
+sell 65000
+buy 64500
+check that payout exceeds polymarket +2% (slippage, fees) (down arrow)
 but no on polymarket ( up arrow)
 we want the call to come up on a low price, and polymarket to come down on c
 
@@ -40,8 +43,8 @@ arb condition fulfilled if price finishes above 65000, or below 65030
 price at 65495
 put spread ( sell above threshold which pays strictly 1 below) // I believe the sell is the reference point for anything below
 
-buy at 66500
-sell at 66000 ( anything below 66 pays strictly 1) 
+buy at 67000
+sell at 66500 ( anything below 66 pays strictly 1) 
 
 buy yes on PM such that everything above 65495 pays strictly 1
 
@@ -49,8 +52,23 @@ example 65497 pays from PM,
 
 
 
+Christoper's Additions:
 
+- If the trading fees can be accessed by the api then they should be set programaticly, if not then you should be able to take in trading fees either through CSV or CLI interface.
 
+- Time slipage needs to be backtest to make sure that the arbitrage opetunity doesn't slip away between the time that the script sees the opertunity and the execution of the order on both markets. There are two approches that we can take to this end:
+
+    - we do back testing to figure out how long they last. If you have optunities that persit for several hours or days the is likly not a real issue but if the oppertunites last for several seconds then this become a major statical issue.
+    
+    - Since the script is running on a loop that repeats every so often eg 30 sec, on min, 5min etc then we can do back testing to figure out what is the optimum time interval to detect these arb opps. Obviously we will only know the min amount of time after we write the script but since we are using python and have stacking tolarences between differnt apis as well as python's slower speed especily if we are doing non trival math assume that the min time for each loop would be abt a 60secs.
+
+    If this is too slow and we are missing good arb opps then we can proably get down to something like a 10 sec loop if we try to rerite the script in something like Go, but if we are talking about 5min or so oppertunitys then the actual time problem becomes trival.
+
+- Oppertunity cost back tests: once we have the script running the we come to the best type of problem to have how much do we put in. We are WELL withing the short term cap gains window so we can basicly buy the arb and then sell it as soon as it closes. We have two opertunity costs to account for frequency and duration.
+
+    - Duration: if the arb opp is a dimond shape (i guess it would techincly rhombus) then it would be worth backtesting to figure out if we should strike once and try to get as close to the wide point as possible or if we take a statistical approch and try to spread our trades out through out the dimond either equaltly or accoriding to a distribution. Of note is this is again dependent on the duration of the arb opps. If they only last for like 200% of the time it takes the program to loop then this becomes a moot point.
+
+    - Frequency: ideally the arb opps would all be sequenctial where if you have $100,000 then you just dump all the cash into the first trade and make $1,000 and sell when it closes and then repeat for the next one and make $2,200 so on but the problem is if they are nested (see figure 1) in this case it might be worth selling and buying the dip (assuming the spike isn't below slipage). Though this for whatever reason Im having a heard to intuiting if this is the correct stratigy. 
 
 
 
