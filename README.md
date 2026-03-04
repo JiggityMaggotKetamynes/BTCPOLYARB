@@ -13,10 +13,10 @@ sell
 *open*
 
 On derebit, the strike prices between options contracts are separated by 500 dollars 
-|strike 1 - strike 2| == 500 dollar increments, which represent a variable cost less than or equal to 500, that pays strictly 500
-normalizing polymarket requires us to buy 500 x (cost from (0,1), which tells us the cost to acquire the payout for strictly 500
+|strike 1 - strike 2| == 500 dollar increments, which represent a variable cost when buying and selling( a net cost) less than or equal to 500, that pays strictly 500
+normalizing polymarket requires us to buy 500 x (cost from (0,1), which tells us the cost to acquire the payout for payout strictly 500
 
-in the last 30 days, the absolute difference of the price at 0800-0700 closes in ~ on 200, that means that there is a good shot that if our 
+in the last 30 days, the absolute difference of the price at p @ 0800- p @ 0700 closes in ~ on 200, that means that there is a good shot that if our 
 strategy is more profitable at the prices closer to the strikes than there our plenty of days due to high nominal value of change that it would run into a favorable 
 condition
 
