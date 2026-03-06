@@ -18,11 +18,14 @@ class DeribitClient:
     def get_nearest_btc_option_expiry(self, today: datetime) -> str:
         result = self._get(
             "/public/get_instruments",
-            {"currency": "BTC", "kind": "option", "expired": False},
+            {"currency": "BTC", "kind": "option"},
         )
 
         expiries: set[str] = set()
         for instrument in result:
+            # Skip expired instruments
+            if instrument.get("is_active") is False:
+                continue
             name = instrument.get("instrument_name", "")
             parts = name.split("-")
             if len(parts) >= 4 and parts[0] == "BTC":
