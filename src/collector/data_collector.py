@@ -82,7 +82,7 @@ def collect_day(target_date: date, settings: Settings, mock: bool = False) -> Pa
                 print(f"[INFO]   Market not accepting orders - orderbook reflects pre-closure state")
 
     # Debug prints for Deribit instruments and strikes
-    print(f"[DEBUG] deribit_expiry: {settings.deribit_expiry}")
+    print(f"[DEBUG] selected_deribit_expiry: {expiry_code}")
     print(f"[DEBUG] call_sell_instrument: {call_sell_instrument}")
     print(f"[DEBUG] call_buy_instrument: {call_buy_instrument}")
     print(f"[DEBUG] put_sell_instrument: {put_sell_instrument}")
@@ -100,8 +100,6 @@ def collect_day(target_date: date, settings: Settings, mock: bool = False) -> Pa
             yes_price = random.uniform(0.3, 0.7)
             no_price = 1.0 - yes_price
         else:
-            if not settings.deribit_expiry:
-                raise ValueError("DERIBIT_EXPIRY is required when mock=False")
 
             # Debug prints before first Deribit API call
             print(f"[DEBUG] About to call Deribit API with:")

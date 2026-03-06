@@ -15,33 +15,38 @@ class DeribitQuote:
 
 class DeribitClient:
 
-        def get_nearest_btc_option_expiry(self, today: datetime) -> str:
-            """
-            Fetch all BTC option instruments, extract expiry codes, and return the soonest expiry after today.
-            """
-            result = self._get("/public/get_instruments", {"currency": "BTC", "kind": "option"})
-            expiries = set()
-            for inst in result:
-                name = inst.get("instrument_name", "")
-                # Example: BTC-07MAR26-70000-C
-                parts = name.split("-")
-                if len(parts) >= 3:
-                    expiries.add(parts[1])
-            # Convert expiry codes to datetime for comparison
-            def expiry_to_dt(code):
-                # e.g., 07MAR26 -> 2026-03-07
-                try:
-                    return datetime.strptime(code, "%d%b%y")
-                except Exception:
-                    return None
-            expiry_dates = sorted([expiry_to_dt(e) for e in expiries if expiry_to_dt(e)], key=lambda d: d)
-            for dt in expiry_dates:
-                if dt and dt.date() >= today.date():
-                    return dt.strftime("%d%b%y").upper()
-            # fallback: return soonest expiry if none are after today
-            if expiry_dates:
-                return expiry_dates[0].strftime("%d%b%y").upper()
+    def get_nearest_btc_option_expiry(self, today: datetime) -> str:
+        result = self._get(
+            "/public/get_instruments",
+            {"currency": "BTC", "kind": "option", "expired": False},
+        )
+
+        expiries: set[str] = set()
+        for instrument in result:
+            name = instrument.get("instrument_name", "")
+            parts = name.split("-")
+            if len(parts) >= 4 and parts[0] == "BTC":
+                expiries.add(parts[1].upper())
+
+        expiry_dates: list[tuple[datetime, str]] = []
+        for expiry_code in expiries:
+            try:
+                parsed = datetime.strptime(expiry_code, "%d%b%y")
+                expiry_dates.append((parsed, expiry_code))
+            except ValueError:
+                continue
+
+        if not expiry_dates:
             raise ValueError("No BTC option expiries found on Deribit")
+
+        expiry_dates.sort(key=lambda item: item[0])
+
+        for expiry_date, expiry_code in expiry_dates:
+            if expiry_date.date() >= today.date():
+                return expiry_code
+
+        return expiry_dates[0][1]
+
     def __init__(self, base_url: str, timeout_seconds: int = 10) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout_seconds = timeout_seconds
