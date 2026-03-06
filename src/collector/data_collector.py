@@ -65,9 +65,9 @@ def collect_day(target_date: date, settings: Settings, mock: bool = False) -> Pa
     # Find Polymarket token IDs for today's 2-3 AM ET market (07:00-08:00 UTC)
     pm_market = None
     if not mock:
-        pm_market = polymarket.find_hourly_bitcoin_market(hour_start_et=2, target_date=date)
+        pm_market = polymarket.find_hourly_bitcoin_market(hour_start_et=2, target_date=target_date)
         if not pm_market:
-            print(f"[WARN] Could not find Polymarket 2-3 AM ET market for {date}. Using mock PM prices.")
+            print(f"[WARN] Could not find Polymarket 2-3 AM ET market for {target_date}. Using mock PM prices.")
         else:
             print(f"[INFO] Found Polymarket market: {pm_market.question[:60]}...")
             print(f"[INFO]   Status: accepting_orders={pm_market.accepting_orders}, closed={pm_market.closed}")
@@ -76,6 +76,14 @@ def collect_day(target_date: date, settings: Settings, mock: bool = False) -> Pa
             if not pm_market.accepting_orders:
                 print(f"[INFO]   Market not accepting orders - orderbook reflects pre-closure state")
 
+    # Debug prints for Deribit instruments and strikes
+    print(f"[DEBUG] deribit_expiry: {settings.deribit_expiry}")
+    print(f"[DEBUG] call_sell_instrument: {call_sell_instrument}")
+    print(f"[DEBUG] call_buy_instrument: {call_buy_instrument}")
+    print(f"[DEBUG] put_sell_instrument: {put_sell_instrument}")
+    print(f"[DEBUG] put_buy_instrument: {put_buy_instrument}")
+    print(f"[DEBUG] call_sell_strike: {call_sell_strike}, call_buy_strike: {call_buy_strike}")
+    print(f"[DEBUG] put_sell_strike: {put_sell_strike}, put_buy_strike: {put_buy_strike}")
     rows: list[dict[str, Any]] = []
     for minute_mark in minute_marks:
         if mock:
@@ -90,12 +98,19 @@ def collect_day(target_date: date, settings: Settings, mock: bool = False) -> Pa
             if not settings.deribit_expiry:
                 raise ValueError("DERIBIT_EXPIRY is required when mock=False")
 
+            # Debug prints before first Deribit API call
+            print(f"[DEBUG] About to call Deribit API with:")
+            print(f"  call_sell_instrument: {call_sell_instrument}")
+            print(f"  call_buy_instrument: {call_buy_instrument}")
+            print(f"  put_sell_instrument: {put_sell_instrument}")
+            print(f"  put_buy_instrument: {put_buy_instrument}")
+
             price_live = deribit.get_live_btc_price()
             call_sell_price = deribit.get_option_mid_price(call_sell_instrument).price
             call_buy_price = deribit.get_option_mid_price(call_buy_instrument).price
             put_sell_price = deribit.get_option_mid_price(put_sell_instrument).price
             put_buy_price = deribit.get_option_mid_price(put_buy_instrument).price
-            
+
             # Use discovered tokens or fallback to 0.5/0.5
             if pm_market:
                 try:
