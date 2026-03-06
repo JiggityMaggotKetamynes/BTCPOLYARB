@@ -32,7 +32,12 @@ def collect_day(target_date: date, settings: Settings, mock: bool = False) -> Pa
     output_file = settings.output_dir / f"{target_date.isoformat()}.csv"
     minute_marks = _minute_range_0700_to_0800_utc(target_date)
 
+
     deribit = DeribitClient(settings.deribit_base_url, settings.request_timeout_seconds)
+
+    # Automatically select nearest expiry after today
+    expiry_code = deribit.get_nearest_btc_option_expiry(datetime.combine(target_date, datetime.min.time(), tzinfo=timezone.utc))
+    print(f"[INFO] Using Deribit expiry: {expiry_code}")
 
     if mock:
         p = 65000.0
@@ -46,16 +51,16 @@ def collect_day(target_date: date, settings: Settings, mock: bool = False) -> Pa
     put_buy_strike = put_sell_strike + settings.strike_interval
 
     call_sell_instrument = deribit.build_option_instrument(
-        settings.deribit_expiry, call_sell_strike, "C"
+        expiry_code, call_sell_strike, "C"
     )
     call_buy_instrument = deribit.build_option_instrument(
-        settings.deribit_expiry, call_buy_strike, "C"
+        expiry_code, call_buy_strike, "C"
     )
     put_sell_instrument = deribit.build_option_instrument(
-        settings.deribit_expiry, put_sell_strike, "P"
+        expiry_code, put_sell_strike, "P"
     )
     put_buy_instrument = deribit.build_option_instrument(
-        settings.deribit_expiry, put_buy_strike, "P"
+        expiry_code, put_buy_strike, "P"
     )
 
     polymarket = PolymarketClient(

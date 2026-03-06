@@ -14,6 +14,34 @@ class DeribitQuote:
 
 
 class DeribitClient:
+
+        def get_nearest_btc_option_expiry(self, today: datetime) -> str:
+            """
+            Fetch all BTC option instruments, extract expiry codes, and return the soonest expiry after today.
+            """
+            result = self._get("/public/get_instruments", {"currency": "BTC", "kind": "option"})
+            expiries = set()
+            for inst in result:
+                name = inst.get("instrument_name", "")
+                # Example: BTC-07MAR26-70000-C
+                parts = name.split("-")
+                if len(parts) >= 3:
+                    expiries.add(parts[1])
+            # Convert expiry codes to datetime for comparison
+            def expiry_to_dt(code):
+                # e.g., 07MAR26 -> 2026-03-07
+                try:
+                    return datetime.strptime(code, "%d%b%y")
+                except Exception:
+                    return None
+            expiry_dates = sorted([expiry_to_dt(e) for e in expiries if expiry_to_dt(e)], key=lambda d: d)
+            for dt in expiry_dates:
+                if dt and dt.date() >= today.date():
+                    return dt.strftime("%d%b%y").upper()
+            # fallback: return soonest expiry if none are after today
+            if expiry_dates:
+                return expiry_dates[0].strftime("%d%b%y").upper()
+            raise ValueError("No BTC option expiries found on Deribit")
     def __init__(self, base_url: str, timeout_seconds: int = 10) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout_seconds = timeout_seconds
