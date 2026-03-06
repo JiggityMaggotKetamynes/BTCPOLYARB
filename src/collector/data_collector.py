@@ -67,7 +67,7 @@ def collect_day(target_date: date, settings: Settings, mock: bool = False) -> Pa
     if not mock:
         pm_market = polymarket.find_hourly_bitcoin_market(hour_start_et=2, target_date=date)
         if not pm_market:
-            print(f"[WARN] Could not find Polymarket 2-3 AM ET market for {date.date()}. Using mock PM prices.")
+            print(f"[WARN] Could not find Polymarket 2-3 AM ET market for {date}. Using mock PM prices.")
         else:
             print(f"[INFO] Found Polymarket market: {pm_market.question[:60]}...")
             print(f"[INFO]   Status: accepting_orders={pm_market.accepting_orders}, closed={pm_market.closed}")
