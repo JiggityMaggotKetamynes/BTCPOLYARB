@@ -81,14 +81,6 @@ def collect_day(target_date: date, settings: Settings, mock: bool = False) -> Pa
             if not pm_market.accepting_orders:
                 print(f"[INFO]   Market not accepting orders - orderbook reflects pre-closure state")
 
-    # Debug prints for Deribit instruments and strikes
-    print(f"[DEBUG] selected_deribit_expiry: {expiry_code}")
-    print(f"[DEBUG] call_sell_instrument: {call_sell_instrument}")
-    print(f"[DEBUG] call_buy_instrument: {call_buy_instrument}")
-    print(f"[DEBUG] put_sell_instrument: {put_sell_instrument}")
-    print(f"[DEBUG] put_buy_instrument: {put_buy_instrument}")
-    print(f"[DEBUG] call_sell_strike: {call_sell_strike}, call_buy_strike: {call_buy_strike}")
-    print(f"[DEBUG] put_sell_strike: {put_sell_strike}, put_buy_strike: {put_buy_strike}")
     rows: list[dict[str, Any]] = []
     for minute_mark in minute_marks:
         if mock:
@@ -100,14 +92,6 @@ def collect_day(target_date: date, settings: Settings, mock: bool = False) -> Pa
             yes_price = random.uniform(0.3, 0.7)
             no_price = 1.0 - yes_price
         else:
-
-            # Debug prints before first Deribit API call
-            print(f"[DEBUG] About to call Deribit API with:")
-            print(f"  call_sell_instrument: {call_sell_instrument}")
-            print(f"  call_buy_instrument: {call_buy_instrument}")
-            print(f"  put_sell_instrument: {put_sell_instrument}")
-            print(f"  put_buy_instrument: {put_buy_instrument}")
-
             price_live = deribit.get_live_btc_price()
             call_sell_price = deribit.get_option_mid_price(call_sell_instrument).price
             call_buy_price = deribit.get_option_mid_price(call_buy_instrument).price
